@@ -30,18 +30,29 @@ while True:
         # 10 sets of 10 seconds
         for set_num in range(1,11):
 
+            flash_num = set_num
+            sleep_duration = 1000
+
+            if set_num >= 5:
+                set_num -= 5
+                sleep_duration -= 220
+                display.show(NUMBERS[flash_num] * 9)
+                music.pitch(1750, 200)
+                display.clear()
+                sleep(20)
+
             for score in range(set_num):
-                display.show(NUMBERS[set_num] * 9)
+                display.show(NUMBERS[flash_num] * 9)
                 music.pitch(1750, 50)
                 display.clear()
-                sleep(10)
+                sleep(20)
 
-            sleep(1000-(50+10)*set_num)
+            sleep(sleep_duration-(50+20)*set_num)
 
             for rest in range(5,0,-1):
                 number_beep(rest, 1000, 3, 500, 50)
 
-            number_beep(set_num, 1000, 9, 1500, 1000)
+            number_beep(flash_num, 1000, 9, 1500, 1000)
 
             for second in range(1,11):
                 number_beep(second, 1000, 6, 1000, 50)
@@ -56,29 +67,15 @@ while True:
 
     if button_b.was_pressed():
 
-        # 10 sets of 5 seconds
-        for set_num in range(1,11):
+        display.show(Image.ALL_CLOCKS, delay=2500, wait=False)
 
-            for score in range(set_num):
-                display.show(NUMBERS[set_num] * 9)
-                music.pitch(1750, 50)
-                display.clear()
-                sleep(10)
-
-            sleep(1000-(50+10)*set_num)
-
-            for rest in range(5,0,-1):
-                number_beep(rest, 1000, 3, 500, 50)
-
-            number_beep(set_num, 1000, 9, 1500, 1000)
-
-            for second in range(1,6):
-                number_beep(second, 1000, 6, 1000, 50)
-
-            display.clear()
+        for i in range(1,31):
+            music.pitch(1250, 50)
+            sleep(1000-50)
 
             if button_b.was_pressed():
                 break
 
         music.play(music.POWER_UP)
+
 
