@@ -32,36 +32,42 @@ while True:
 
             flash_num = set_num
             sleep_duration = 1000
+            LONG_BEEP = 333
+            SHORT_BEEP = 50
+            PAUSE = 50
 
-            if set_num >= 5:
+
+            for _ in range (set_num//5):
                 set_num -= 5
-                sleep_duration -= 220
+                sleep_duration -= LONG_BEEP + PAUSE
                 display.show(NUMBERS[flash_num] * 9)
-                music.pitch(1750, 200)
+                music.pitch(1750, LONG_BEEP)
                 display.clear()
-                sleep(20)
+                sleep(PAUSE)
 
             for score in range(set_num):
                 display.show(NUMBERS[flash_num] * 9)
-                music.pitch(1750, 50)
+                music.pitch(1750, SHORT_BEEP)
                 display.clear()
-                sleep(20)
+                sleep(PAUSE)
 
-            sleep(sleep_duration-(50+20)*set_num)
+            sleep(sleep_duration - (SHORT_BEEP + PAUSE)*set_num)
 
             for rest in range(5,0,-1):
-                number_beep(rest, 1000, 3, 500, 50)
+                number_beep(rest, 1000, 3, 500, SHORT_BEEP)
 
             number_beep(flash_num, 1000, 9, 1500, 1000)
 
             for second in range(1,11):
-                number_beep(second, 1000, 6, 1000, 50)
+                number_beep(second, 1000, 6, 1000, SHORT_BEEP)
 
             display.clear()
 
-
             if button_b.was_pressed():
-                break
+                display.scroll("paused", wait=False)
+                while not button_a.is_pressed():
+                    pass
+                display.clear()
 
         music.play(music.POWER_UP)
 
@@ -70,11 +76,21 @@ while True:
         display.show(Image.ALL_CLOCKS, delay=2500, wait=False)
 
         for i in range(1,31):
-            music.pitch(1250, 50)
+            if not i%15:
+                pitch = 900
+            elif not i%2:
+                pitch = 600
+            else:
+                pitch = 800
+
+            music.pitch(pitch, 50)
             sleep(1000-50)
 
             if button_b.was_pressed():
-                break
+                display.scroll("paused", wait=False)
+                while not button_a.is_pressed():
+                    pass
+                display.clear()
 
         music.play(music.POWER_UP)
 
