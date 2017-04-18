@@ -13,85 +13,95 @@ NUMBERS = [ Image("01110:01010:01010:01010:01110"), #0
             Image("01110:01010:01110:00010:00010"), #9
             Image("10111:10101:10101:10101:10111"),]#10
 
-def timer(length=None, brightness=5):
-    display.show([i*brightness for i in numbers[1:length]], delay=1000, clear=True)
+#def timer(length=None, brightness=5):
+#   display.show([i*brightness for i in numbers[1:length]], delay=1000, clear=True)
 
 def number_beep(number, duration, brightness, frequency, sound_length):
     display.show(NUMBERS[number] * brightness)#, wait=False)
     music.pitch(frequency, sound_length, wait=False)
     sleep(duration)
 
-while True:
+def number_flash(number, brightness, pitch, sound_duration, pause_duration):
+    display.show(NUMBERS[number] * brightness)
+    music.pitch(pitch, sound_duration)
+    display.clear()
+    sleep(pause_duration)
 
-    display.show(Image.HAPPY*1/9)
+def flash_set_number(set_number):
 
-    if button_a.was_pressed():
+    flash_num = set_number
+    sleep_duration = 1000
+    LONG_BEEP = 333
+    SHORT_BEEP = 50
+    PAUSE = 50
 
-        # 10 sets of 10 seconds
-        for set_num in range(1,11):
+    for _ in range (set_number//5):
+        set_number -= 5
+        sleep_duration -= LONG_BEEP + PAUSE
+        number_flash(flash_num, 9, 1750, LONG_BEEP, PAUSE)
 
-            flash_num = set_num
-            sleep_duration = 1000
-            LONG_BEEP = 333
-            SHORT_BEEP = 50
-            PAUSE = 50
+    for _ in range(set_number):
+        number_flash(flash_num, 9, 1750, SHORT_BEEP, PAUSE)
 
+    sleep(sleep_duration - (SHORT_BEEP + PAUSE)*set_number)
 
-            for _ in range (set_num//5):
-                set_num -= 5
-                sleep_duration -= LONG_BEEP + PAUSE
-                display.show(NUMBERS[flash_num] * 9)
-                music.pitch(1750, LONG_BEEP)
-                display.clear()
-                sleep(PAUSE)
+def start_sets(num_sets, set_len):
 
-            for score in range(set_num):
-                display.show(NUMBERS[flash_num] * 9)
-                music.pitch(1750, SHORT_BEEP)
-                display.clear()
-                sleep(PAUSE)
+    for set_num in range(1, num_sets+1):
+        play_set(set_num, set_len)
+    music.play(music.POWER_UP)
 
-            sleep(sleep_duration - (SHORT_BEEP + PAUSE)*set_num)
+def play_set(set_num, set_len):
 
-            for rest in range(5,0,-1):
-                number_beep(rest, 1000, 3, 500, SHORT_BEEP)
+    SHORT_BEEP = 50
 
-            number_beep(flash_num, 1000, 9, 1500, 1000)
+    # flash set number
+    flash_set_number(set_num)
 
-            for second in range(1,11):
-                number_beep(second, 1000, 6, 1000, SHORT_BEEP)
+    # coutdown
+    for rest in range(5, 0, -1):
+        number_beep(rest, 1000, 3, 500, SHORT_BEEP)
 
-            display.clear()
+    # begin set
+    number_beep(set_num, 1000, 9, 1500, 1000)
 
-            if button_b.was_pressed():
-                display.scroll("paused", wait=False)
-                while not button_a.is_pressed():
-                    pass
-                display.clear()
+    # countup
+    for second in range(1, set_len+1):
+        number_beep(second, 1000, 6, 1000, SHORT_BEEP)
 
-        music.play(music.POWER_UP)
+    display.clear()
 
+    # pause
     if button_b.was_pressed():
+        display.show(Image.TARGET/9)
+        while not button_a.is_pressed():
+            pass
+        display.clear()
 
-        display.show(Image.ALL_CLOCKS, delay=2500, wait=False)
+def rest(seconds):
+    display.show([x/9 for x in Image.ALL_CLOCKS], delay=(seconds*1000)/12, wait=False)
 
-        for i in range(1,31):
-            if not i%15:
-                pitch = 900
-            elif not i%2:
-                pitch = 600
-            else:
-                pitch = 800
+    for i in range(1, seconds+1):
+        if i%15 == 0:
+            pitch = 900
+        elif i%2 == 0:
+            pitch = 600
+        else:
+            pitch = 800
 
-            music.pitch(pitch, 50)
-            sleep(1000-50)
+        music.pitch(pitch, 50)
+        sleep(1000-50)
 
-            if button_b.was_pressed():
-                display.scroll("paused", wait=False)
-                while not button_a.is_pressed():
-                    pass
-                display.clear()
+    music.play(music.POWER_UP)
 
-        music.play(music.POWER_UP)
+if __name__ == "__main__":
 
+    while True:
+        display.show(Image.HAPPY/9)
 
+        if button_a.was_pressed():
+            # 10 sets of 10 seconds
+            start_sets(10, 10)
+
+        if button_b.was_pressed():
+            rest(30)
