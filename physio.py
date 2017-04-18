@@ -79,7 +79,7 @@ def play_set(set_num, set_len):
         display.clear()
 
 def rest(seconds):
-    display.show([x/9 for x in Image.ALL_CLOCKS], delay=(seconds*1000)/12, wait=False)
+    display.show([x/9 for x in Image.ALL_CLOCKS], delay=(seconds*1000)//12, wait=False)
 
     for i in range(1, seconds+1):
         if i%15 == 0:
